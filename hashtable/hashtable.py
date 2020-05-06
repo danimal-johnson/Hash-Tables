@@ -11,24 +11,31 @@ class HashTableEntry:
 
 class HashTable:
     """
-    A hash table that with `capacity` buckets
+    A hash table with `capacity` buckets
     that accepts string keys
-
-    Implement this.
     """
+
+    def __init__(self, capacity=128):
+        self.capacity = capacity
+        self.storage = self.capacity * [None]
 
     def fnv1(self, key):
         """
         FNV-1 64-bit hash function
-
-        Implement this, and/or DJB2.
         """
+        FNV_offset_basis = 14695981039346656037
+        FNV_prime = 1099511628211  # (0x100000001b3)
+
+        hash = FNV_prime
+        for byte in key:
+            hash *= FNV_prime
+            hash = hash ^ ord(byte)  # ord = unicode location of the byte
+        return hash
 
     def djb2(self, key):
         """
         DJB2 32-bit hash function
-
-        Implement this, and/or FNV-1.
+        TODO: Not implemented, optional.
         """
 
     def hash_index(self, key):
@@ -36,35 +43,36 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.fnv1(key) % self.capacity
+        # return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
         Store the value with the given key.
-
         Hash collisions should be handled with Linked List Chaining.
-
-        Implement this.
         """
+        index = self.hash_index(key)
+        if self.storage[index] != None:
+            print("Collision")
+        self.storage[self.hash_index(key)] = value
 
     def delete(self, key):
         """
         Remove the value stored with the given key.
-
         Print a warning if the key is not found.
-
-        Implement this.
         """
+        index = self.hash_index(key)
+        if self.storage[index] == None:
+            print("Warning: No value found at this location!")
+        else:
+            self.storage[index] = None
 
     def get(self, key):
         """
         Retrieve the value stored with the given key.
-
         Returns None if the key is not found.
-
-        Implement this.
         """
+        return self.storage[self.hash_index(key)]
 
     def resize(self):
         """
@@ -73,6 +81,8 @@ class HashTable:
 
         Implement this.
         """
+        pass
+
 
 if __name__ == "__main__":
     ht = HashTable(2)
