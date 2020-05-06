@@ -52,14 +52,47 @@ class HashTable:
         return self.fnv1(key) % self.capacity
         # return self.djb2(key) % self.capacity
 
-    def add_to_list(self, key, value):
-        pass
+    def add_to_list(self, node, key, value):
+        prev_node = node
+        # Scan through the list for the key
+        while node.next != None and node.key != key:
+            prev_node = node
+            node = node.next
+        # Now we're either at the target node or the last node
+        if node.key == key:
+            node.value = value
+        else:
+            node.next = HashTableEntry(key, value)
 
-    def get_from_list(self, key):
-        pass
+    def get_from_list(self, node, key):
+        while node != None and node.key != key:
+            node = node.next
 
-    def remove_from_list(self, key):
-        pass
+        if node == None:
+            return None  # Value not found.
+        if node.key == key:
+            return node.value
+        else:
+            return "That didn't go as planned."
+
+    def remove_from_list(self, node, key):
+        prev_node = node
+        # Scan through the list for the key
+        while node.next != None and node.key != key:
+            prev_node = node
+            node = node.next
+        # Now we're either at the target node or the last node
+        if node.key == key:
+            prev_node.next = node.next
+            return True  # Node successfully deleted
+        else:
+            return False  # Key lookup failed
+
+    def display_collision_list(self, key):
+        node = self.storage[self.hash_index(key)]
+        while node != None:
+            print("{", node.key, ":", node.value, "}")
+            node = node.next
 
     def put(self, key, value):
         """
@@ -70,9 +103,8 @@ class HashTable:
         if self.storage[index] == None:
             self.storage[index] = HashTableEntry(key, value)
         else:
-            print("Collision")
-            # TODO: parse list first
-            self.storage[index].value = value
+            # print("Collision")
+            self.add_to_list(self.storage[index], key, value)
 
     def delete(self, key):
         """
@@ -83,8 +115,9 @@ class HashTable:
         if self.storage[index] == None:
             print("Warning: No value found at this location!")
         else:
-            # TODO: Parse through the list first.
-            self.storage[index] = None
+            success = self.remove_from_list(self.storage[index], key)
+            if success == False:
+                print("Warning: No value found at this location!")
 
     def get(self, key):
         """
@@ -96,7 +129,7 @@ class HashTable:
             return None
         else:  # TODO: parse through the list.
             list_head = self.storage[index]
-            return list_head.value
+            return self.get_from_list(list_head, key)
 
     def resize(self):
         """
