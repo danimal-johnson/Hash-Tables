@@ -9,6 +9,12 @@ class HashTableEntry:
         self.next = None
 
 
+class SinglyLinkedList:
+    """
+    A list that may not be necessary
+    """
+
+
 class HashTable:
     """
     A hash table with `capacity` buckets
@@ -46,15 +52,27 @@ class HashTable:
         return self.fnv1(key) % self.capacity
         # return self.djb2(key) % self.capacity
 
+    def add_to_list(self, key, value):
+        pass
+
+    def get_from_list(self, key):
+        pass
+
+    def remove_from_list(self, key):
+        pass
+
     def put(self, key, value):
         """
         Store the value with the given key.
         Hash collisions should be handled with Linked List Chaining.
         """
         index = self.hash_index(key)
-        if self.storage[index] != None:
+        if self.storage[index] == None:
+            self.storage[index] = HashTableEntry(key, value)
+        else:
             print("Collision")
-        self.storage[self.hash_index(key)] = value
+            # TODO: parse list first
+            self.storage[index].value = value
 
     def delete(self, key):
         """
@@ -65,6 +83,7 @@ class HashTable:
         if self.storage[index] == None:
             print("Warning: No value found at this location!")
         else:
+            # TODO: Parse through the list first.
             self.storage[index] = None
 
     def get(self, key):
@@ -72,7 +91,12 @@ class HashTable:
         Retrieve the value stored with the given key.
         Returns None if the key is not found.
         """
-        return self.storage[self.hash_index(key)]
+        index = self.hash_index(key)
+        if self.storage[index] == None:
+            return None
+        else:  # TODO: parse through the list.
+            list_head = self.storage[index]
+            return list_head.value
 
     def resize(self):
         """
@@ -84,6 +108,7 @@ class HashTable:
         pass
 
 
+### Testing functions follow ###
 if __name__ == "__main__":
     ht = HashTable(2)
 
